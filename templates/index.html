@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF to PNG 변환기</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>PDF를 PNG로 변환</h1>
+        <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="pdf_file" accept="application/pdf" required>
+            <button type="submit">업로드 및 변환</button>
+        </form>
+
+        <div id="download-section" style="display: none;">
+            <h2>변환된 파일 다운로드</h2>
+            <div id="download-links"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
