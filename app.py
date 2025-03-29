@@ -10,6 +10,9 @@ app = Flask(__name__)
 OUTPUT_FOLDER = 'static/converted'
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
+# Poppler 경로 (Windows에서는 직접 지정 필요)
+POPPER_PATH = r'C:\poppler\Library\bin'  # ← 본인 시스템에 맞게 수정
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -29,26 +32,25 @@ def upload_file():
     pdf_path = f'{OUTPUT_FOLDER}/{unique_id}.pdf'
     file.save(pdf_path)
 
-    # PDF → PNG 변환
     try:
-        images = convert_from_path(pdf_path)
+        # PDF → PNG 변환 (Poppler 경로 명시)
+        images = convert_from_path(pdf_path, poppler_path=POPPER_PATH)
         png_urls = []
 
         for i, image in enumerate(images):
             png_filename = f'{unique_id}_page_{i + 1}.png'
             png_path = os.path.join(OUTPUT_FOLDER, png_filename)
             image.save(png_path, 'PNG')
-
             png_urls.append(f'/{OUTPUT_FOLDER}/{png_filename}')
 
-        os.remove(pdf_path)  # PDF 원본 삭제해도 되고 안 해도 됨
+        os.remove(pdf_path)
 
         return jsonify({'png_urls': png_urls})
 
     except Exception as e:
+        print("에러 발생:", e)  # 🔥 반드시 있어야 함
         return jsonify({'error': str(e)}), 500
 
-# 정적 파일 다운로드용 라우트 (필요한 경우)
 @app.route('/static/converted/<filename>')
 def download_file(filename):
     return send_from_directory(OUTPUT_FOLDER, filename)
